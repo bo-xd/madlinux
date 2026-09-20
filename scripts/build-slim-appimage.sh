@@ -4,11 +4,8 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
 
-echo "==> Building frontend..."
-npm run build
-
-echo "==> Building release binary..."
-cargo build --release --manifest-path src-tauri/Cargo.toml
+echo "==> Building production binary with embedded frontend..."
+npx tauri build --no-bundle
 
 APPDIR="$DIR/build/AppDir"
 OUT_DIR="$DIR/build"

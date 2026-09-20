@@ -591,16 +591,13 @@ fn apply_wine_tweaks(runtime: &Path, compat: &Path) -> Result<(), String> {
 
 [HKEY_CURRENT_USER\Software\Wine\X11 Driver]
 "UsePrimarySelection"="N"
-"GrabPointer"="Y"
-"GrabFullscreen"="Y"
-"AutoCaptureMouse"="Y"
-"ShowCursor"="Y"
-"MouseWarpOverride"="enable"
-"Decorated"="Y"
-"Managed"="Y"
+"GrabPointer"=-
+"GrabFullscreen"=-
+"AutoCaptureMouse"=-
+"MouseWarpOverride"=-
+"ShowCursor"=-
 
-[HKEY_CURRENT_USER\Software\Wine\DirectInput]
-"MouseDataMode"="abs"
+[-HKEY_CURRENT_USER\Software\Wine\DirectInput]
 "#;
   let _ = fs::write(&tweaks_reg, reg_content);
   let mut log = String::new();
@@ -647,8 +644,7 @@ export PROTON_SET_STEAM_DRIVE="0"
 export WINEDEBUG="-all"
 export DXVK_LOG_LEVEL="none"
 
-# Wine clipboard and mouse optimizations
-export WINE_DISABLE_RAW_INPUT="0"
+# Wine optimizations
 export PROTON_ENABLE_NVAPI="1"
 
 cd "{}"

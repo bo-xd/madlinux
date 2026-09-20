@@ -1,0 +1,21 @@
+{
+  "name": "madlinux",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "tauri": "tauri",
+    "tauri:build": "NO_STRIP=1 tauri build",
+    "build:appimage": "bash scripts/build-slim-appimage.sh"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.8.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3"
+  }
+}

@@ -1,0 +1,18 @@
+# Node dependencies & web builds
+node_modules/
+dist/
+
+# Rust build artifacts
+src-tauri/target/
+build/
+
+# Large binaries & cache
+*.AppImage
+*.deb
+src-tauri/resources/deps/
+src-tauri/resources/installer-payload/
+src-tauri/resources/*.exe
+
+# Environment & logs
+*.log
+.DS_Store

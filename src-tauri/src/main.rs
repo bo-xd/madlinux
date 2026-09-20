@@ -581,6 +581,39 @@ fn install(app: &tauri::AppHandle, state: &Shared) -> Result<(), String> {
   Ok(())
 }
 
+fn apply_wine_tweaks(runtime: &Path, compat: &Path) -> Result<(), String> {
+  let pfx = compat.join("pfx");
+  if !pfx.join("system.reg").exists() {
+    return Ok(());
+  }
+  let tweaks_reg = compat.join("wine-tweaks.reg");
+  let reg_content = r#"Windows Registry Editor Version 5.00
+
+[HKEY_CURRENT_USER\Software\Wine\X11 Driver]
+"UsePrimarySelection"="N"
+"GrabPointer"="Y"
+"GrabFullscreen"="Y"
+"AutoCaptureMouse"="Y"
+"ShowCursor"="Y"
+"MouseWarpOverride"="enable"
+"Decorated"="Y"
+"Managed"="Y"
+
+[HKEY_CURRENT_USER\Software\Wine\DirectInput]
+"MouseDataMode"="abs"
+"#;
+  let _ = fs::write(&tweaks_reg, reg_content);
+  let mut log = String::new();
+  let _ = run_proton(
+    runtime,
+    compat,
+    &["run", "regedit.exe", "/s", tweaks_reg.to_str().unwrap()],
+    &mut log,
+  );
+  let _ = fs::remove_file(&tweaks_reg);
+  Ok(())
+}
+
 fn setup_desktop_integration(
   base: &Path,
   runtime: &Path,
@@ -590,6 +623,9 @@ fn setup_desktop_integration(
   let home = PathBuf::from(std::env::var_os("HOME").ok_or("Could not locate HOME directory")?);
   let madium_dir = madium_exe.parent().unwrap_or(madium_exe);
   let run_script = base.join("run-madium.sh");
+
+  // Apply Wine clipboard and mouse responsiveness tweaks to prefix
+  let _ = apply_wine_tweaks(runtime, compat);
 
   let script_content = format!(
 r#"#!/usr/bin/env bash
@@ -610,6 +646,10 @@ export PROTON_SET_GAME_DRIVE="0"
 export PROTON_SET_STEAM_DRIVE="0"
 export WINEDEBUG="-all"
 export DXVK_LOG_LEVEL="none"
+
+# Wine clipboard and mouse optimizations
+export WINE_DISABLE_RAW_INPUT="0"
+export PROTON_ENABLE_NVAPI="1"
 
 cd "{}"
 exec "{}" run "{}" "$@"

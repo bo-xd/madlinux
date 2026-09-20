@@ -10,3 +10,7 @@ npm run build:appimage
 ```
 
 This generates `MadLinux_0.1.0_amd64.AppImage`.
+
+## Credits
+
+Please give credits if you use this project.

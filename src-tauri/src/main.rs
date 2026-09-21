@@ -10,7 +10,7 @@ use std::{
 };
 use tauri::{Manager, State};
 
-const PROTON_URL: &str = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-6/GE-Proton11-6.tar.gz";
+const PROTON_URL: &str = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-6/GE-Proton11-6-x86_64.tar.gz";
 const DOTNET_URL: &str = "https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe";
 const WEBVIEW_URL: &str = "https://go.microsoft.com/fwlink/p/?LinkId=2124703";
 const INSTALLER_URL: &str = "https://cdn.getmadium.me/Installer-1.1.0.exe";
@@ -396,7 +396,7 @@ fn install(app: &tauri::AppHandle, state: &Shared) -> Result<(), String> {
         &["-xzf", archive.to_str().unwrap(), "-C", runtime.parent().unwrap().to_str().unwrap()],
         &mut log,
       )?;
-      let extracted = runtime.parent().unwrap().join("GE-Proton11-6");
+      let extracted = runtime.parent().unwrap().join("GE-Proton11-6-x86_64");
       fs::rename(extracted, &runtime).map_err(|e| e.to_string())?;
       state.lock().unwrap().log.push_str(&log);
     }
@@ -591,13 +591,13 @@ fn apply_wine_tweaks(runtime: &Path, compat: &Path) -> Result<(), String> {
 
 [HKEY_CURRENT_USER\Software\Wine\X11 Driver]
 "UsePrimarySelection"="N"
-"GrabPointer"=-
-"GrabFullscreen"=-
-"AutoCaptureMouse"=-
-"MouseWarpOverride"=-
-"ShowCursor"=-
 
-[-HKEY_CURRENT_USER\Software\Wine\DirectInput]
+; Keep the game-specific pointer behavior out of Madium's windows. A global
+; pointer grab can leave the desktop stuck with a resize cursor after a popup
+; is dismissed. Roblox captures the cursor only after it enters fullscreen;
+; its chooser therefore keeps a normal, visible cursor.
+[HKEY_CURRENT_USER\Software\Wine\AppDefaults\RobloxPlayerBeta.exe\X11 Driver]
+"GrabFullscreen"="Y"
 "#;
   let _ = fs::write(&tweaks_reg, reg_content);
   let mut log = String::new();
